@@ -19,17 +19,20 @@ while True:
 
     elif command == 'tap':
         desPosX = input("Which is your desiable pos for tap in x,y?")
-        desPozY = input()
-        send.write(b'tap: desPosX, desPosY')
+        desPosY = input()
+        text = bytes(f"tap: {desPosX},{desPosY},")
+        send.write(text)
     
     elif command == 'doubleTap':
         desPosX = input("Which is your desiable pos for doubletap in x,y?")
-        desPozY = input()
-        send.write(b'doubletap: desPosX, desPosY')
+        desPosY = input()
+        text = bytes(f"doubleTap: {desPosX},{desPosY},")
+        send.write(text)
     elif command == 'press':
         desPosX = input("Which is your desiable pos for press in x,y?")
-        desPozY = input()
-        send.write(b'press: desPosX, desPosY')
+        desPosY = input()
+        text = bytes(f"press: {desPosX},{desPosY},")
+        send.write(text)
     else:
         print("Exiting")
         break
