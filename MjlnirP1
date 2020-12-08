@@ -1,0 +1,38 @@
+import time
+import serial
+strComPort = '/dev/ttyACM0'
+strComBaud = 9600
+
+send = serial.Serial(strComPort, strComBaud)
+time.sleep(2) #sec
+
+while True:
+    command = input("Enter command from list: \nswipe\ntap\ndoubletap\npress\n")
+
+    if command == 'swipe':
+        fromx = input("From which position in x, y do you want to swipe?")
+        fromy = input()
+        tox = input("To which position in x, y do you want to swipe?")
+        toy = input()
+        text = bytes(f"swipe: {fromx},{fromy},{tox},{toy},", encoding = "ascii") #'swipe:'+ fromx + "," + fromy + "," + tox + "," + toy'
+        send.write(text)
+
+    elif command == 'tap':
+        desPosX = input("Which is your desiable pos for tap in x,y?")
+        desPosY = input()
+        text = bytes(f"tap: {desPosX},{desPosY},", encoding = "ascii")
+        send.write(text)
+    
+    elif command == 'doubletap':
+        desPosX = input("Which is your desiable pos for doubletap in x,y?")
+        desPosY = input()
+        text = bytes(f"doubletap: {desPosX},{desPosY},", encoding = "ascii")
+        send.write(text)
+    elif command == 'press':
+        desPosX = input("Which is your desiable pos for press in x,y?")
+        desPosY = input()
+        text = bytes(f"press: {desPosX},{desPosY},", encoding = "ascii")
+        send.write(text)
+    else:
+        print("Exiting")
+        break
