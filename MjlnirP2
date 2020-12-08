@@ -1,0 +1,52 @@
+# Press OK Coordinate : x,y : 50,500
+# Swipe o - > Coordinate : x,y : 250, 0 - 250, 100
+# Swipe < - o Coordinate : x,y : 250, 100 - 250, 0
+# Swipe ^ Coordinate : x,y : 0, 500 - 500, 500
+# Swipe v Coordinate : x,y : 500, 500 - 0, 500
+# Press *KEY* Coordinate : x,y : 150,250
+# Doubletap *KEY* Coordinate : x,y : 200,175
+
+import time
+import serial
+strComPort = '/dev/ttyACM0'
+strComBaud = 9600
+
+send = serial.Serial(strComPort, strComBaud)
+time.sleep(2) #sec
+
+while True:
+    command = input("Enter command from list: \nswipe\ntap\ndoubletap\npress\n")
+
+    if command == 'swipe':
+        choice = input("Enter swipe choice from list: \n1: o->\n2: <-o\n3: ^\n4: v\n")
+        if choice == '1':
+            text = bytes(f"swipe:250,0,250,100,", encoding = "ascii")
+            send.write(text)
+        elif choice == '2':
+            text = bytes(f"swipe:250,100,250,0,", encoding = "ascii")
+            send.write(text)
+        elif choice == '3':
+            text = bytes(f"swipe:0,500,500,500,", encoding = "ascii")
+            send.write(text)
+        elif choice == '4':
+            text = bytes(f"swipe:500,500,0,500,", encoding = "ascii")
+            send.write(text)
+        else:
+            print("Not a valid choice.. Exiting")
+            break
+
+    elif command == 'tap':
+        text = bytes(f"tap: 50,500,", encoding = "ascii")
+        send.write(text)
+    
+    elif command == 'doubletap':
+        text = bytes(f"doubletap:200,175,", encoding = "ascii")
+        send.write(text)
+
+    elif command == 'press':
+        text = bytes(f"press:150,250,", encoding = "ascii")
+        send.write(text)
+
+    else:
+        print("Exiting")
+        break
