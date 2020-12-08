@@ -16,11 +16,24 @@
 AccelStepper motor_X(1, MOTOR_X_STEP_PIN, MOTOR_X_DIR_PIN);
 AccelStepper motor_Y(1, MOTOR_Y_STEP_PIN, MOTOR_Y_DIR_PIN);
 AccelStepper motor_Z(1, MOTOR_Z_STEP_PIN, MOTOR_Z_DIR_PIN);
+
+const int trigPin = 9;
+const int echoPin = 10;
+long duration;
+int distance;
+
 MultiStepper steppers;
+
+int up = 0, down = 50, doubletapup = 30;
+long positions[3];
+
 
 void setup()
 {  
     Serial.begin(9600);
+
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT); 
 
     motor_X.setEnablePin(MOTOR_X_ENABLE_PIN);
     motor_Y.setEnablePin(MOTOR_Y_ENABLE_PIN);
@@ -48,19 +61,183 @@ void setup()
     steppers.addStepper(motor_Z);
 }
 
-
-
 void loop()
 {
+  if (Serial.available() > 0 ){
+    parsing();}
 
-long positions[3];
-positions[0] = 0;
-positions[1] = 0;
-positions[2] = 0;
-
-steppers.moveTo(positions);
-steppers.runSpeedToPosition();
-
-
-    
 }
+
+void swipe(int fromPosX, int fromPosY, int toPosX, int toPosY){
+  
+  positions[0] = fromPosX;
+  positions[1] = fromPosY;
+  positions[2] = up;
+  posit(positions);
+  
+  positions[0] = fromPosX;
+  positions[1] = fromPosY;
+  positions[2] = down;
+  posit(positions);
+  
+  positions[0] = toPosX;
+  positions[1] = toPosY;
+  positions[2] = down;
+  posit(positions);
+  
+  positions[0] = toPosX;
+  positions[1] = toPosY;
+  positions[2] = up;
+  posit(positions);
+  
+  homePos();
+}
+
+void tapDown(int tapPosX, int tapPosY){
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = down;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  homePos();
+}
+
+void pressDown(long tapPosX, long tapPosY){
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = down;
+  posit(positions);
+  
+   delay(1000);
+  
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  homePos();
+}
+
+void doubleTap(long tapPosX, long tapPosY){
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = down;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = doubletapup;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = down;
+  posit(positions);
+
+  positions[0] = tapPosX;
+  positions[1] = tapPosY;
+  positions[2] = up;
+  posit(positions);
+
+  homePos();
+}
+
+void homePos(){
+  
+  positions[0] = 0;
+  positions[1] = 0;
+  positions[2] = 0;
+  posit(positions);
+  
+}
+
+void posit(long pos[3]){
+
+  for (int r = 0; r <= 3; r++ )
+    {positions[pos[r]];}
+           
+                  digitalWrite(trigPin, LOW);
+                  delayMicroseconds(2);
+                  // Sets the trigPin on HIGH state for 10 micro seconds
+                  digitalWrite(trigPin, HIGH);
+                  delayMicroseconds(10);
+                  digitalWrite(trigPin, LOW);
+                  // Reads the echoPin, returns the sound wave travel time in microseconds
+                  duration = pulseIn(echoPin, HIGH);
+                  // Calculating the distance
+                  distance= duration*0.034/2;
+                  // Prints the distance on the Serial Monitor
+                  Serial.print("Distance: ");
+                  Serial.println(distance);
+
+       if (distance > 3){
+          steppers.moveTo(positions);
+          steppers.runSpeedToPosition();
+          delay(100);
+                  Serial.println("Done");
+            }
+
+       else{
+          Serial.println("Solly, too close!");
+    }
+
+}
+
+
+void parsing(){
+  Serial.println("Let's-a go!");  
+
+String command = Serial.readStringUntil(':');
+String args = Serial.readStringUntil('\n');
+
+
+    String sa[4]; int r=0, t=0;
+      for (int i=0; i < args.length(); i++){
+        if(args.charAt(i) == ','){
+          sa[t] = args.substring(r, i);
+          r=(i+1);
+          t++;
+               }//for
+                  }//if
+
+           Serial.println(command);
+
+  if (command == "swipe"){
+    swipe(sa[0].toInt(),sa[1].toInt(),sa[2].toInt(), sa[3].toInt());
+      } //if
+  
+    else if (command == "tap"){
+      tapDown(sa[0].toInt(),sa[1].toInt());}
+    
+      else if (command == "doubletap"){
+        doubleTap(sa[0].toInt(),sa[1].toInt());}
+
+        else if (command == "press"){
+          pressDown(sa[0].toInt(),sa[1].toInt());}
+
+          else{
+            Serial.print("K, bye!");
+  }
+      
+ } //parsing
