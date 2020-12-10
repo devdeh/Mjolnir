@@ -1,3 +1,11 @@
+# Swipe o - > Coordinate : x,y : 250, 0 - 250, 100
+# Swipe < - o Coordinate : x,y : 250, 100 - 250, 0
+# Swipe ^ Coordinate : x,y : 0, 500 - 500, 500
+# Swipe v Coordinate : x,y : 500, 500 - 0, 500
+# Tap OK Coordinate : x,y : 50,500
+# Press *KEY* Coordinate : x,y : 150,250
+# Doubletap *KEY* Coordinate : x,y : 200,175
+
 import time
 import serial
 strComPort = '/dev/ttyACM0'
@@ -6,33 +14,27 @@ strComBaud = 9600
 send = serial.Serial(strComPort, strComBaud)
 time.sleep(2) #sec
 
-while True:
-    command = input("Enter command from list: \nswipe\ntap\ndoubletap\npress\n")
-
-    if command == 'swipe':
-        fromx = input("From which position in x, y do you want to swipe?")
-        fromy = input()
-        tox = input("To which position in x, y do you want to swipe?")
-        toy = input()
-        text = bytes(f"swipe: {fromx},{fromy},{tox},{toy},", encoding = "ascii") #'swipe:'+ fromx + "," + fromy + "," + tox + "," + toy'
+def choice(choice):
+    if choice == 'up':
+        text = bytes(f"swipe:0,500,500,500,", encoding = "ascii")
         send.write(text)
-
-    elif command == 'tap':
-        desPosX = input("Which is your desiable pos for tap in x,y?")
-        desPosY = input()
-        text = bytes(f"tap: {desPosX},{desPosY},", encoding = "ascii")
+    elif choice == 'down':
+        text = bytes(f"swipe:500,500,0,500,", encoding = "ascii")
         send.write(text)
-    
-    elif command == 'doubletap':
-        desPosX = input("Which is your desiable pos for doubletap in x,y?")
-        desPosY = input()
-        text = bytes(f"doubletap: {desPosX},{desPosY},", encoding = "ascii")
+    elif choice == 'left':
+        text = bytes(f"swipe:250,100,250,0,", encoding = "ascii")
         send.write(text)
-    elif command == 'press':
-        desPosX = input("Which is your desiable pos for press in x,y?")
-        desPosY = input()
-        text = bytes(f"press: {desPosX},{desPosY},", encoding = "ascii")
+    elif choice == 'right':
+        text = bytes(f"swipe:250,0,250,100,", encoding = "ascii")
+        send.write(text)
+    elif choice == 'tap':
+        text = bytes(f"tap: 50,500,", encoding = "ascii")
+        send.write(text)
+    elif choice == 'press':
+        text = bytes(f"press:150,250,", encoding = "ascii")
+        send.write(text)
+    elif choice == 'doubletap':
+        text = bytes(f"doubletap:200,175,", encoding = "ascii")
         send.write(text)
     else:
-        print("Exiting")
-        break
+        print("SOLLY")
